@@ -3,6 +3,7 @@
 
 .text
         addi $t0, $zero, 5      # $t0 = 5
+	addi $t3, $zero, 6	# $t3 = 6
         addi $t1, $zero, 15     # $t1 = 15
         add  $s0, $t0, $t1      # $s0 = $t0 + $t1 = 20
         addi $s1, $s0, -3       # $s1 = 20 - 3 = 17

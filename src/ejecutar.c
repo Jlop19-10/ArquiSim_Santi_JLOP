@@ -62,6 +62,39 @@ Resultado ejecutar(CPU *cpu, const Instruccion *in)
         return OK;
     }
 
+    if (es(in, "sub") || es(in, "subu")) {
+        uint32_t r = restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+        if (es(in, "sub") && (cpu->banderas & BANDERA_V))
+            return excepcion(cpu, "desbordamiento aritmético en sub");
+        escribir_registro(cpu, in->rd, r);
+        return OK;
+    }
+
+    if (es(in, "lui")) {
+        uint32_t r = ((uint32_t)in->imm) << 16;
+        banderas_logicas(cpu, r);
+        escribir_registro(cpu, in->rt, r);
+        return OK;
+    }
+
+    if (es(in, "ori")) {
+        uint32_t r = cpu->reg[in->rs] | (uint32_t)(in->imm & 0xFFFF);
+        banderas_logicas(cpu, r);
+        escribir_registro(cpu, in->rt, r);
+        return OK;
+    }
+
+    if (es(in, "and")) {
+        uint32_t r = 0;
+        if(cpu->reg[in->rs] == cpu->reg[in->rt])
+            r = 1;
+        escribir_registro(cpu, in->rt, r);
+        return OK;
+    }
+
+
+
+
     /*
      * TODO: para cada instrucción nueva
      *   1. agregue su línea en isa.txt (formato, opcode, funct, operandos)
