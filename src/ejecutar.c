@@ -61,7 +61,7 @@ Resultado ejecutar(CPU *cpu, const Instruccion *in)
         escribir_registro(cpu, in->rt, r);
         return OK;
     }
-
+    /* ---------------- sub rt, rs, imm ---------------- */
     if (es(in, "sub") || es(in, "subu")) {
         uint32_t r = restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
         if (es(in, "sub") && (cpu->banderas & BANDERA_V))
@@ -69,27 +69,112 @@ Resultado ejecutar(CPU *cpu, const Instruccion *in)
         escribir_registro(cpu, in->rd, r);
         return OK;
     }
-
+    /* ---------------- lui rt, imm ---------------- */
     if (es(in, "lui")) {
         uint32_t r = ((uint32_t)in->imm) << 16;
         banderas_logicas(cpu, r);
         escribir_registro(cpu, in->rt, r);
         return OK;
     }
-
+    /* ---------------- ori rt, imm ---------------- */
     if (es(in, "ori")) {
         uint32_t r = cpu->reg[in->rs] | (uint32_t)(in->imm & 0xFFFF);
         banderas_logicas(cpu, r);
         escribir_registro(cpu, in->rt, r);
         return OK;
     }
-
+    /* ---------------- and rs, rt, rd ---------------- */
     if (es(in, "and")) {
-        uint32_t r = 0;
-        if(cpu->reg[in->rs] == cpu->reg[in->rt])
-            r = 1;
-        escribir_registro(cpu, in->rt, r);
-        return OK;
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = val_rs & val_rt;
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }
+
+    /* ---------------- andi rs, rt, rd ---------------- */
+    if (es(in, "andi")) {
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_r = ((uint32_t)in->imm) & 0xFFFF;
+    uint32_t resultado = val_rs & val_r;
+    resultado = banderas_logicas(cpu, resultado);
+    escribir_registro(cpu, in->rt, resultado); 
+    return OK;
+    }
+
+    /* ---------------- nor rs, rt, rd ---------------- */
+    if (es(in, "nor")) {
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = ~(val_rs | val_rt);
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }   
+
+    /* ---------------- sll rd, rt, shamt ---------------- */
+    if (es(in, "sll")) {
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = (1U << in->shamt)*val_rt;
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }  
+
+    /* ---------------- srl rd, rt, shamt ---------------- */
+    if (es(in, "srl")) {
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = val_rt >> in->shamt;
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }
+    
+   /* ---------------- sra rd, rt, shamt ---------------- */
+    if (es(in, "sra")) {
+    int32_t val_rt = (int32_t)cpu->reg[in->rt]; 
+    int32_t resultado = val_rt >> in->shamt;    
+    escribir_registro(cpu, in->rd, (uint32_t)resultado);
+    return OK;
+    }
+    
+    /* ---------------- or rs, rt, rd ---------------- */
+    if (es(in, "or")) {
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = val_rs | val_rt;
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }
+
+    /* ---------------- xor rs, rt, rd ---------------- */
+    if (es(in, "xor")) {
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_rt = cpu->reg[in->rt];
+    uint32_t resultado = val_rs ^ val_rt;
+    escribir_registro(cpu, in->rd, resultado); 
+    return OK;
+    }
+    
+    /* ---------------- xori rs, rt, rd ---------------- */
+    if (es(in, "xori")) {
+    uint32_t val_rs = cpu->reg[in->rs];
+    uint32_t val_r = ((uint32_t)in->imm) & 0xFFFF;
+    uint32_t resultado = val_rs ^ val_r;
+    resultado = banderas_logicas(cpu, resultado);
+    escribir_registro(cpu, in->rt, resultado); 
+    return OK;
+    }
+
+    /* ---------------- addu rd, rs, rt ---------------- */
+    if (es(in, "addu")) {
+    uint32_t r = sumar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+    }
+
+    /* ---------------- addiu rt, rs, simm ---------------- */
+    if (es(in, "addiu")) {
+    uint32_t r = sumar_con_banderas(cpu, cpu->reg[in->rs], (uint32_t)in->simm);
+    escribir_registro(cpu, in->rt, r);
+    return OK;
     }
 
 

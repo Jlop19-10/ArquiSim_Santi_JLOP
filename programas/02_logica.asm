@@ -4,7 +4,6 @@
 .text
         lui  $s1, 0x8A2C            # $s1 = 0x8A2C0000
         ori  $s1, $s1, 0x9031       # $s1 = 0x8A2C9031  (constante de 32 bits)
-
         lui  $t0, 0x8000            # máscara del bit más significativo
         and  $t1, $s1, $t0          # $t1 = 0x80000000  -> el MSB es 1
         ori  $t2, $s1, 0x00FF       # $t2 = 0x8A2C90FF  -> encender los 8 bits bajos

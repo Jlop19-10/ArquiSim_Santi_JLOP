@@ -8,6 +8,7 @@
 .text
         lui   $t0, 0x7FFF
         ori   $t0, $t0, 0xFFFF      # 0x7FFFFFFF: el mayor entero positivo
+	addu  $t2,$t0, $t0
         addiu $t1, $t0, 1           # 0x80000000: da la vuelta SIN excepción
         addu  $t2, $t0, $t0         # 0xFFFFFFFE
         subu  $t3, $zero, $t0       # 0 - 0x7FFFFFFF = 0x80000001
