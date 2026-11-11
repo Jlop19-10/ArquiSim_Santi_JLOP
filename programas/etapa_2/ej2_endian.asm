@@ -21,8 +21,19 @@ Y:      .space 4
 .text
 # escriba aquí su código
 
-	ori $t0, $zero, X
-	lbu $s0,0($s0)
-	lbu $s1,1($s0)
-	lbu $s2,2($s0)
-        lbu $s3,3($s0)
+# 1. Cargar bytes de X (Big-Endian)
+        ori  $t0, $zero, X       # $t0 = dirección base de X
+        lbu  $s0, 0($t0)         # $s0 = 0x11 (Predicción: byte más significativo)
+        lbu  $s1, 1($t0)         # $s1 = 0x22
+        lbu  $s2, 2($t0)         # $s2 = 0x33
+        lbu  $s3, 3($t0)         # $s3 = 0x44 (Predicción: byte menos significativo)
+
+# 2. Escribir en Y (0x204) en orden Little-Endian byte por byte con sb
+        ori  $t1, $zero, Y       # $t1 = dirección base de Y
+        sb   $s3, 0($t1)         # Guarda 0x44 en Y+0 (el byte menor va en la dirección menor)
+        sb   $s2, 1($t1)         # Guarda 0x33 en Y+1
+        sb   $s1, 2($t1)         # Guarda 0x22 en Y+2
+        sb   $s0, 3($t1)         # Guarda 0x11 en Y+3
+
+# 3. Leer Y como palabra con lw en $s4
+        lw   $s4, 0($t1)         # $s4 contendrá el valor 0x44332211
