@@ -31,3 +31,5 @@ SUMA:   .word 0
 	add  $s2, $s2, $t3
 	ori  $s1, $zero, SUMA
 	sw   $s2, 0($s1)
+	sw   $t3, 0($s0)
+        sw   $t0, 12($s0)
