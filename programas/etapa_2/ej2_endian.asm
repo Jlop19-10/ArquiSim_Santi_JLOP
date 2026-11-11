@@ -21,3 +21,8 @@ Y:      .space 4
 .text
 # escriba aquí su código
 
+	ori $t0, $zero, X
+	lbu $s0,0($s0)
+	lbu $s1,1($s0)
+	lbu $s2,2($s0)
+        lbu $s3,3($s0)
