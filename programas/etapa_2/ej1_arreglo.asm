@@ -21,3 +21,13 @@ SUMA:   .word 0
 .text
 # escriba aquí su código
 
+	ori  $s0, $zero, A
+	lw   $t0, 0($s0)
+	lw   $t1, 4($s0)
+	lw   $t2, 8($s0)
+	lw   $t3, 12($s0)
+	add  $s2, $t0, $t1
+	add  $s2, $s2, $t2
+	add  $s2, $s2, $t3
+	ori  $s1, $zero, SUMA
+	sw   $s2, 0($s1)
