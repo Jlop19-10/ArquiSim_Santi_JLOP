@@ -1,0 +1,5 @@
+# Reto: ARR = {5, -3, 8, -1, 0, -7, 12, -20} -> 4 negativos
+$v0 = 4                         # valor devuelto por CONTAR
+mem[0x220] = 4                  # RES (variable en .data, justo después de ARR)
+mem[0x400] = 0x01010101         # píxeles (0,0) .. (3,0) en rojo (color 1)
+mem[0x404] = 0                  # el píxel (4,0) NO se pintó
