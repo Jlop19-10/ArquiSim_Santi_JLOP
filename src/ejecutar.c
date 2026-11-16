@@ -35,6 +35,7 @@
  */
 #include <string.h>
 #include "cpu.h"
+#include "sistema.h"
 
 static int es(const Instruccion *in, const char *mnemonico)
 {
