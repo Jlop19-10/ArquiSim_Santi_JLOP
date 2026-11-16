@@ -97,14 +97,7 @@ la     I  001000  -       rt,imm,rs=$zero          addi   # la $t0, A       ->  
 b      I  000100  -       label,rs=$zero,rt=$zero  beq    # b LOOP          ->  beq  $zero, $zero, LOOP
 
 # ---------------- Agregue aquí las instrucciones de las etapas 4 y 5 ----------------
-# ---------------- Etapa 5: Extensiones del ISA (2 direcciones) ----------------
-add     R   000000  100000  rd+rs,rt
-sub     R   000000  100010  rd+rs,rt
-and     R   000000  100100  rd+rs,rt
-or      R   000000  100101  rd+rs,rt
-addi    I   001000  -       rt+rs,imm
-
-# ---------------- Etapa 5: Acumulador y Extensiones ----------------
+# ---------------- Etapa 5: Extensiones del ISA ----------------
 mtacc   R   000000  010101  rs                  # ACC = rs
 mfacc   R   000000  010100  rd                  # rd = ACC
 add     R   000000  110000  rt      adda        # ACC = ACC + rt (banderas)
