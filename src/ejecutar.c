@@ -213,6 +213,105 @@ Resultado ejecutar(CPU *cpu, const Instruccion *in)
         return OK;
     }
 
+    /* ================ Etapa 5: Extensiones del ISA ================ */
+
+    /* ---------------- Acumulador y operaciones asociadas ---------------- */
+    if (es(in, "mtacc")) {
+        cpu->acc = cpu->reg[in->rs];
+        return OK;
+    }
+    if (es(in, "mfacc")) {
+        escribir_registro(cpu, in->rd, cpu->acc);
+        return OK;
+    }
+    if (es(in, "adda")) {
+        cpu->acc = sumar_con_banderas(cpu, cpu->acc, cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "suba")) {
+        cpu->acc = restar_con_banderas(cpu, cpu->acc, cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "addia")) {
+        cpu->acc = sumar_con_banderas(cpu, cpu->acc, (uint32_t)in->simm);
+        return OK;
+    }
+
+    /* ---------------- Comparación y saltos por banderas ---------------- */
+    if (es(in, "cmp")) {
+        restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]); // Solo actualiza banderas
+        return OK;
+    }
+    if (es(in, "jz")) {
+        if (cpu->banderas & BANDERA_Z)
+            cpu->pc = (cpu->pc & 0xF0000000u) | (in->direccion << 2);
+        return OK;
+    }
+    if (es(in, "jn")) {
+        if (cpu->banderas & BANDERA_N)
+            cpu->pc = (cpu->pc & 0xF0000000u) | (in->direccion << 2);
+        return OK;
+    }
+    if (es(in, "jc")) {
+        if (cpu->banderas & BANDERA_C)
+            cpu->pc = (cpu->pc & 0xF0000000u) | (in->direccion << 2);
+        return OK;
+    }
+    if (es(in, "jv")) {
+        if (cpu->banderas & BANDERA_V)
+            cpu->pc = (cpu->pc & 0xF0000000u) | (in->direccion << 2);
+        return OK;
+    }
+
+    /* ---------------- Multiplicación, División y Registros HI/LO ---------------- */
+    if (es(in, "mult")) {
+        int64_t res = (int64_t)(int32_t)cpu->reg[in->rs] * (int64_t)(int32_t)cpu->reg[in->rt];
+        cpu->hi = (uint32_t)(res >> 32);
+        cpu->lo = (uint32_t)(res & 0xFFFFFFFFu);
+        return OK;
+    }
+    if (es(in, "multu")) {
+        uint64_t res = (uint64_t)cpu->reg[in->rs] * (uint64_t)cpu->reg[in->rt];
+        cpu->hi = (uint32_t)(res >> 32);
+        cpu->lo = (uint32_t)(res & 0xFFFFFFFFu);
+        return OK;
+    }
+    if (es(in, "div")) {
+        int32_t denominador = (int32_t)cpu->reg[in->rt];
+        if (denominador == 0)
+            return excepcion(cpu, "división entre cero");
+        int32_t numerador = (int32_t)cpu->reg[in->rs];
+        cpu->lo = (uint32_t)(numerador / denominador);
+        cpu->hi = (uint32_t)(numerador % denominador);
+        return OK;
+    }
+    if (es(in, "divu")) {
+        uint32_t denominador = cpu->reg[in->rt];
+        if (denominador == 0)
+            return excepcion(cpu, "división entre cero");
+        uint32_t numerador = cpu->reg[in->rs];
+        cpu->lo = numerador / denominador;
+        cpu->hi = numerador % denominador;
+        return OK;
+    }
+    if (es(in, "mfhi")) {
+        escribir_registro(cpu, in->rd, cpu->hi);
+        return OK;
+    }
+    if (es(in, "mflo")) {
+        escribir_registro(cpu, in->rd, cpu->lo);
+        return OK;
+    }
+    if (es(in, "mul")) {
+        uint32_t res = cpu->reg[in->rs] * cpu->reg[in->rt];
+        escribir_registro(cpu, in->rd, res);
+        return OK;
+    }
+
+    /* ---------------- Llamada al sistema (Syscall) ---------------- */
+    if (es(in, "syscall")) {
+        return llamar_sistema(cpu);
+    }
     /*
      * TODO: para cada instrucción nueva
      *   1. agregue su línea en isa.txt (formato, opcode, funct, operandos)
